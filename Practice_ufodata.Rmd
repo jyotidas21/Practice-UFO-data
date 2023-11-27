@@ -1,0 +1,120 @@
+---
+title: "Practice ufo"
+output: html_document
+date: "2023-11-26"
+params:
+  ufo_shape: 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(purrr)
+library(lubridate)
+library(forcats)
+library(stringr)
+library(ggthemes)
+
+```
+
+
+```{r}
+ufodata <- read.csv("ufo_sightings.csv")
+
+```
+
+
+```{r}
+class(ufodata$date_time)
+#str(ufodata)
+ufodata$date_time <- mdy_hm(ufodata$date_time)
+ufodata$date_documented <- mdy(ufodata$date_documented)
+
+```
+
+```{r}
+class(ufodata$date_time)
+class(ufodata$date_documented)
+```
+
+```{r}
+#installing leaflet from html htmlwidgets
+
+# Filter out rows with missing or invalid latitude/longitude values
+ufodata <- ufodata[complete.cases(ufodata$latitude, ufodata$longitude), ]
+
+library(leaflet)
+pal <- colorQuantile("YlOrRd", NULL, n = 8)
+leaflet(ufodata) %>% 
+  addTiles() %>%
+  addCircleMarkers(color = ~pal(encounter_length))
+
+```
+
+
+
+```{r}
+#barplot by shape count 
+
+shape_count <- ufodata %>%
+  group_by(ufo_shape) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(3)
+
+```
+
+
+
+```{r}
+#installing plotly
+
+library(ggplot2)
+library(plotly)
+p <- ggplot(data = shape_count, aes(x = ufo_shape, fill = ufo_shape)) +
+  geom_bar(position = "dodge")
+ggplotly(p)
+```
+
+
+
+
+
+```{r}
+#installing data table & creating 
+
+library(DT)
+datatable(ufodata, options = list(pageLength = 5))
+```
+
+
+```{r}
+library(flexdashboard)
+```
+
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

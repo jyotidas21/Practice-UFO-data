@@ -1,0 +1,84 @@
+---
+title: "UFO Data"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(purrr)
+library(lubridate)
+library(forcats)
+library(stringr)
+library(ggthemes)
+
+```
+
+```{r}
+ufodata <- read.csv("ufo_sightings.csv")
+
+class(ufodata$date_time)
+#str(ufodata)
+ufodata$date_time <- mdy_hm(ufodata$date_time)
+ufodata$date_documented <- mdy(ufodata$date_documented)
+
+
+class(ufodata$date_time)
+class(ufodata$date_documented)
+#installing leaflet from html htmlwidgets
+
+# Filter out rows with missing or invalid latitude/longitude values
+ufodata <- ufodata[complete.cases(ufodata$latitude, ufodata$longitude), ]
+
+library(leaflet)
+pal <- colorQuantile("YlOrRd", NULL, n = 8)
+leaflet(ufodata) %>% 
+  addTiles() %>%
+  addCircleMarkers(color = ~pal(encounter_length))
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+#barplot by shape count 
+
+shape_count <- ufodata %>%
+  group_by(ufo_shape) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(3)
+
+#installing plotly
+
+library(ggplot2)
+library(plotly)
+p <- ggplot(data = shape_count, aes(x = ufo_shape, fill = ufo_shape)) +
+  geom_bar(position = "dodge")
+ggplotly(p)
+```
+
+### Chart C
+
+```{r}
+#installing data table & creating 
+
+library(DT)
+datatable(ufodata, options = list(pageLength = 5))
+```
+
