@@ -97,7 +97,9 @@ datatable(ufodata, options = list(pageLength = 5))
 library(flexdashboard)
 ```
 
-
+```{r}
+head(ufodata)
+```
 
 ## R Markdown
 
