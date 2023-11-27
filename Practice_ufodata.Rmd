@@ -65,7 +65,7 @@ shape_count <- ufodata %>%
   group_by(ufo_shape) %>%
   summarize(count = n()) %>%
   arrange(desc(count)) %>%
-  head(3)
+  head(4)
 
 ```
 
